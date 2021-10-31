@@ -1,9 +1,9 @@
-import json
+import json, re
 from os import replace
 from flask import Flask, jsonify, request
-import re
+from autorizacion import Autorizacion
 
-from werkzeug.wrappers import response
+autorizacion = Autorizacion()
 
 app = Flask(__name__)
 
@@ -14,20 +14,8 @@ def ping():
 @app.route('/api/procesar', methods=['POST'])
 def procesar():
     print("\n Procesando....")
-    # print(request.json["SOLICITUD_AUTORIZACION"]["DTE"][2])
     
-    #Formateando nuestros datos
-    for dte in request.json["SOLICITUD_AUTORIZACION"]["DTE"]:
-        for attr in dte:
-            regg = re.search("(\s){2,}", dte[attr])
-            if regg:
-                quitar = regg.group()
-                dato = dte[attr]
-                dato = dato.replace(quitar, "").replace("\n", "")
-                dte[attr] = dato
-
-        fecha = re.search("((\d{2})\/){2}\d{4}", dte["TIEMPO"])
-        dte["TIEMPO"] = fecha.group()
+    autorizacion.construccion(request.json)
         
     print(request.json["SOLICITUD_AUTORIZACION"]["DTE"])
 
@@ -35,6 +23,7 @@ def procesar():
 
 @app.route('/api/consultaDatos')
 def consultaDatos():
+    print(autorizacion.ListadoAutorizaciones)
     return jsonify({"menssage":"Server On!!!"})
 
 @app.route('/api/resumenRango')
