@@ -1,0 +1,13 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="container">
+    <br><br><br>
+    <h1>Consulta Datos</h1>
+
+    {% if texto != None %}
+        <p> {{texto}} </p>
+    {% endif %}
+
+</div>
+{% endblock %}

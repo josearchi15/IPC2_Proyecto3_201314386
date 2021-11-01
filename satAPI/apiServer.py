@@ -21,12 +21,12 @@ def procesar():
 
     return jsonify(request.json)
 
-@app.route('/api/consultaDatos')
+@app.route('/api/consultaDatos', methods=["GET"])
 def consultaDatos():
     print(autorizacion.ListadoAutorizaciones)
-    return jsonify({"menssage":"Server On!!!"})
+    return jsonify(autorizacion.ListadoAutorizaciones)
 
-@app.route('/api/resumenRango')
+@app.route('/api/resumenRango', methods=["GET"])
 def resumenRago():
     return jsonify({"menssage":"Server On!!!"})
 
