@@ -16,14 +16,10 @@ def carga(request):
         print("Enviando archivo...")
 
         fileUploaded = request.FILES["document"]
-        # fileData = fileUploaded.read().decode("utf-8")
-        # print(fileData)
         data_dict = xmltodict.parse(fileUploaded)
         fileUploaded.close()
-        # print(data_dict)
         json_data = json.dumps( data_dict )
         json_object = json.loads(json_data)
-        # print(json_object)
 
         response = requests.post(BASE_API_URL+"procesar", json=json_object)
         print("Enviando archivo...")
@@ -31,11 +27,12 @@ def carga(request):
         print(response.json())
 
     return render(request, "cargaArchivo.html", {})
-    # return redirect("consulta-datos")
 
 def consultaDatos(request):
     response = requests.get(BASE_API_URL+"consultaDatos")
+    json_formatted_str = json.dumps(response.json(), indent=2)
+    print(json_formatted_str)
     print(response.json)
     
-    return render(request, "consultaDatos.html", {"texto":response.json})
+    return render(request, "consultaDatos.html", {"texto":json_formatted_str})
     

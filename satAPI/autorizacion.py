@@ -13,12 +13,15 @@ class Autorizacion:
             "REFERENCIA_DUPLICADA":[]
         }
         self.facturasCorrectas = 0
-        self.cantidadEmisores = 0
-        self.cantidadReceptores = 0
+        self.cantidadEmisores = []
+        self.cantidadReceptores = []
         self.ListadoAutorizaciones = list()
+        self.aprobaciones = []
 
-    def construccion(self, jsonData): #json con fecha ya formateada para cada dte
+    def construccion(self, jsonData): #json enviado del request
+        arrFechasTemp = []
         for dte in jsonData["SOLICITUD_AUTORIZACION"]["DTE"]:
+            self.facturasRecibidas += 1
             for attr in dte:
                 regg = re.search("(\s){2,}", dte[attr])
                 if regg:
@@ -33,8 +36,6 @@ class Autorizacion:
             dte["NIT_EMISOR"] = nitValido(dte["NIT_EMISOR"]) 
             dte["NIT_RECEPTOR"] = nitValido(dte["NIT_RECEPTOR"])
             
-
-
             valor2decimales = "{:.2f}".format(float(dte["VALOR"]))
             dte["VALOR"] = str(valor2decimales)
             iva2decimales = "{:.2f}".format(float(dte["IVA"]))
@@ -58,9 +59,6 @@ class Autorizacion:
             resultado = "{:.2f}".format(resultado)
             
             
-              
-
-
             #  VALIDACIONES DE LOS DATOS
             if len(dte["REFERENCIA"]) > 40: #  Referencia: Maximo 40 Posiciones
                 self.errores["REFERENCIA_DUPLICADA"].append(dte["REFERENCIA"])
@@ -75,9 +73,42 @@ class Autorizacion:
             elif iva != ivaEsperado:   # si el total esta correcto pero el iva no
                 self.errores["IVA"].append(dte["IVA"])
             else:
+                if dte["NIT_EMISOR"] not in self.cantidadEmisores:
+                    self.cantidadEmisores.append(dte["NIT_EMISOR"])
+                if dte["NIT_RECEPTOR"] not in self.cantidadReceptores:
+                    self.cantidadReceptores.append(dte["NIT_RECEPTOR"])
                 self.ListadoAutorizaciones.append(dte)
+        self.aprobar()
+    
+    def aprobar(self):
+        for dte in self.ListadoAutorizaciones:
+            objDte = {
+                "NIT_EMISOR": dte["NIT_EMISOR"],
+                "REFERENCIA": dte["REFERENCIA"]
+            }
+            self.aprobaciones.append(objDte)
 
+    def consultaDatos(self):
+        objInfo = {
+            "AUTORIZACION":{
+                "FECHA": self.fecha,
+                "FACTURAS_RECIBIDAS": self.facturasRecibidas,
+                "ERRORES":{
+                    "NIT_EMISOR":len(self.errores["NIT_EMISOR"]),
+                    "NIT_RECEPTOR":len(self.errores["NIT_RECEPTOR"]),
+                    "IVA":len(self.errores["IVA"]),
+                    "TOTAL":len(self.errores["TOTAL"]),
+                    "REFERENCIA_DUPLICADA":len(self.errores["REFERENCIA_DUPLICADA"]),
+                },
+                "FACTURAS_CORRECTAS":len(self.ListadoAutorizaciones),
+                "CANTIDAD_EMISORES":len(self.cantidadEmisores),
+                "CANTIDAD_RECEPTORES":len(self.cantidadReceptores),
+                "LISTADO_ATORIZACIONES": self.aprobaciones,
+                "TOTAL_APROBACIONES":len(self.ListadoAutorizaciones)
+            } 
 
+        }
+        return objInfo
 
 
 def nitValido(nit):

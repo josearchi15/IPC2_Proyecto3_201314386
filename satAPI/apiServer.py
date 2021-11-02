@@ -16,15 +16,21 @@ def procesar():
     print("\n Procesando....")
     
     autorizacion.construccion(request.json)
-        
-    print(request.json["SOLICITUD_AUTORIZACION"]["DTE"])
+
+    # json_formatted_str = json.dumps(request.json, indent=2)    
+    # print(json_formatted_str)
+    autoriacionesJson = json.dumps(autorizacion.ListadoAutorizaciones, indent=2)
+    print(autoriacionesJson)
 
     return jsonify(request.json)
 
 @app.route('/api/consultaDatos', methods=["GET"])
 def consultaDatos():
-    print(autorizacion.ListadoAutorizaciones)
-    return jsonify(autorizacion.ListadoAutorizaciones)
+    # # print(autorizacion.consultaDatos())
+    # json_formatted_str = json.dumps(autorizacion.consultaDatos(), indent=2)
+    # print(json_formatted_str)
+    return jsonify(autorizacion.consultaDatos())
+
 
 @app.route('/api/resumenRango', methods=["GET"])
 def resumenRago():
