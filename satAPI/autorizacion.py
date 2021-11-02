@@ -17,9 +17,10 @@ class Autorizacion:
         self.cantidadReceptores = []
         self.ListadoAutorizaciones = list()
         self.aprobaciones = []
+        self.arrFechasTemp = []
+        self.idFecha = {}
 
     def construccion(self, jsonData): #json enviado del request
-        arrFechasTemp = []
         for dte in jsonData["SOLICITUD_AUTORIZACION"]["DTE"]:
             self.facturasRecibidas += 1
             for attr in dte:
@@ -77,6 +78,7 @@ class Autorizacion:
                     self.cantidadEmisores.append(dte["NIT_EMISOR"])
                 if dte["NIT_RECEPTOR"] not in self.cantidadReceptores:
                     self.cantidadReceptores.append(dte["NIT_RECEPTOR"])
+                dte["CODIGO_AUTORIZACION"] = codigoAutorizacion(dte, self.arrFechasTemp, self.idFecha)
                 self.ListadoAutorizaciones.append(dte)
         self.aprobar()
     
@@ -84,7 +86,8 @@ class Autorizacion:
         for dte in self.ListadoAutorizaciones:
             objDte = {
                 "NIT_EMISOR": dte["NIT_EMISOR"],
-                "REFERENCIA": dte["REFERENCIA"]
+                "REFERENCIA": dte["REFERENCIA"], 
+                "CODIGO_AUTORIZACION":dte["CODIGO_AUTORIZACION"]
             }
             self.aprobaciones.append(objDte)
 
@@ -135,3 +138,25 @@ def nitValido(nit):
     elif identificador >= 10:
         nit = "Invalido"
     return nit
+
+def codigoAutorizacion(dte, listFechas, conteoFecha):
+    if dte["TIEMPO"] in listFechas:
+        print("Ya esta")
+        conteoFecha[dte["TIEMPO"]] += 1
+    else:
+        listFechas.append(dte["TIEMPO"])
+        conteoFecha[dte["TIEMPO"]] =1
+        
+    str1=encabezado(dte["TIEMPO"])
+    for i in range(8-len(str(conteoFecha[dte["TIEMPO"]]))):
+        str1 += "0"
+    str1 += str(conteoFecha[dte["TIEMPO"]])
+    return str1  
+
+
+def encabezado(fecha):
+    arr = fecha.split("/")[::-1]
+    strFormat = ""
+    for wr in arr:
+        strFormat += wr
+    return strFormat
