@@ -10,11 +10,13 @@ class Autorizacion:
             "NIT_RECEPTOR":[],
             "IVA":[],
             "TOTAL":[],
-            "REFERENCIA_DUPLICADA":[]
+            "REFERENCIA_DUPLICADA":[],
+            "REFERENCIA_INCORRECT":[]
         }
         self.facturasCorrectas = 0
         self.cantidadEmisores = []
         self.cantidadReceptores = []
+        self.noReferencias = []
         self.ListadoAutorizaciones = list()
         self.aprobaciones = []
         self.arrFechasTemp = []
@@ -62,9 +64,7 @@ class Autorizacion:
             
             #  VALIDACIONES DE LOS DATOS
             if len(dte["REFERENCIA"]) > 40: #  Referencia: Maximo 40 Posiciones
-                self.errores["REFERENCIA_DUPLICADA"].append(dte["REFERENCIA"])
-            elif dte["REFERENCIA"] in self.errores["NIT_EMISOR"]:  #si la referencia este duplicada
-                self.errores["REFERENCIA_DUPLICADA"].append(dte["REFERENCIA"])
+                self.errores["REFERENCIA_INCORRECTA"].append(dte["REFERENCIA"])
             elif len(dte["NIT_EMISOR"]) > 21 or dte["NIT_EMISOR"] == "Invalido": #valida si el nit emisor esta correcto
                 self.errores["NIT_EMISOR"].append(dte["NIT_EMISOR"])
             elif len(dte["NIT_RECEPTOR"]) > 21 or dte["NIT_RECEPTOR"] == "Invalido": #valida si el nit receptor esta correcto
@@ -73,7 +73,10 @@ class Autorizacion:
                 self.errores["TOTAL"].append(dte["TOTAL"])
             elif iva != ivaEsperado:   # si el total esta correcto pero el iva no
                 self.errores["IVA"].append(dte["IVA"])
+            elif dte["REFERENCIA"] in self.noReferencias:
+                self.errores["REFERENCIA_DUPLICADA"].append(dte["REFERENCIA"]) 
             else:
+                self.noReferencias.append(dte["REFERENCIA"])
                 if dte["NIT_EMISOR"] not in self.cantidadEmisores:
                     self.cantidadEmisores.append(dte["NIT_EMISOR"])
                 if dte["NIT_RECEPTOR"] not in self.cantidadReceptores:
@@ -141,7 +144,7 @@ def nitValido(nit):
 
 def codigoAutorizacion(dte, listFechas, conteoFecha):
     if dte["TIEMPO"] in listFechas:
-        print("Ya esta")
+        # print("Ya esta")
         conteoFecha[dte["TIEMPO"]] += 1
     else:
         listFechas.append(dte["TIEMPO"])

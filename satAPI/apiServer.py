@@ -17,18 +17,14 @@ def procesar():
     
     autorizacion.construccion(request.json)
 
-    # json_formatted_str = json.dumps(request.json, indent=2)    
-    # print(json_formatted_str)
     autoriacionesJson = json.dumps(autorizacion.ListadoAutorizaciones, indent=2)
     print(autoriacionesJson)
 
-    return jsonify(request.json)
+    return jsonify(autoriacionesJson)
 
 @app.route('/api/consultaDatos', methods=["GET"])
 def consultaDatos():
-    # # print(autorizacion.consultaDatos())
-    # json_formatted_str = json.dumps(autorizacion.consultaDatos(), indent=2)
-    # print(json_formatted_str)
+    
     return jsonify(autorizacion.consultaDatos())
 
 

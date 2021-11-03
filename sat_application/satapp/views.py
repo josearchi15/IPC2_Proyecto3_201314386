@@ -1,9 +1,11 @@
 from django.http import response
 from django.shortcuts import redirect, render
 from django.core.files.storage import FileSystemStorage
+from matplotlib import image
 import requests
 import json
 import xmltodict
+from .utils import get_plot
 
 BASE_API_URL = "http://127.0.0.1:4000/api/"
 
@@ -36,3 +38,14 @@ def consultaDatos(request):
     
     return render(request, "consultaDatos.html", {"texto":json_formatted_str})
     
+def graficaFechas(request):
+    if request.method == "POST":
+        print(request.POST['start'])
+    
+        xval = [80, 85, 90, 95, 100, 105, 110, 115, 120, 125]
+        yval = [240, 250, 260, 270, 280, 290, 300, 310, 320, 330]
+        chart = get_plot(xval, yval)
+    else:
+        chart = None
+        
+    return render(request, "graficaFecha.html", {'chart':chart})
