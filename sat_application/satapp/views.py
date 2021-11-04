@@ -5,7 +5,7 @@ from matplotlib import image
 import requests
 import json
 import xmltodict
-from .utils import get_plot
+from .utils import get_plot, toDate
 
 BASE_API_URL = "http://127.0.0.1:4000/api/"
 
@@ -40,12 +40,24 @@ def consultaDatos(request):
     
 def graficaFechas(request):
     if request.method == "POST":
-        print(request.POST['start'])
-    
-        xval = [80, 85, 90, 95, 100, 105, 110, 115, 120, 125]
-        yval = [240, 250, 260, 270, 280, 290, 300, 310, 320, 330]
-        chart = get_plot(xval, yval)
+        start = toDate(request.POST['start'], "-")
+        end = toDate(request.POST['end'], "-")
+
+        data = {'start':str(start), 'end':str(end), 'nit':request.POST['nit']}
+
+        response = requests.get(BASE_API_URL+"resumenRango", json=data)
+        print(response.json())
+        # imagen movimientos Receptor
+        xval = response.json()["receptor"]["nits"]
+        yval = response.json()["receptor"]["movimientos"]
+        chart = get_plot(xval, yval, "NIT "+data['nit'], "Fecha", "Movimientos")
+
+        # imagen movimientos Emisor
+        xval1 = response.json()["emisor"]["nits"]
+        yval1 = response.json()["emisor"]["movimientos"]
+        chart2 = get_plot(xval1, yval1, "NIT "+data['nit'], "Fecha", "Movimientos")
     else:
         chart = None
+        chart2 = None
         
-    return render(request, "graficaFecha.html", {'chart':chart})
+    return render(request, "graficaFecha.html", {'chart':chart, 'chart2':chart2})

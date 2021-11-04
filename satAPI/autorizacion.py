@@ -1,5 +1,5 @@
 import datetime, re
-
+from utils import toDateDMY, toDateYMD
 class Autorizacion:
     def __init__(self):
         date = datetime.datetime.now()
@@ -93,6 +93,47 @@ class Autorizacion:
                 "CODIGO_AUTORIZACION":dte["CODIGO_AUTORIZACION"]
             }
             self.aprobaciones.append(objDte)
+    
+    def resumenPorNit(self, data):
+        dFrom = toDateYMD(data['start'],"-")
+        dTo = toDateYMD(data['end'],"-")
+        nit = data['nit']
+        arreglosEmisor = {
+            'nits':[],
+            'movimientos':[]
+        }
+
+        for dte in self.ListadoAutorizaciones:
+            dateCheck = toDateDMY(dte['TIEMPO'],"/")
+            print(nit)
+            print(dte["NIT_EMISOR"])
+            if nit == dte["NIT_EMISOR"] and dFrom < dateCheck < dTo:
+                if dte['TIEMPO'] in arreglosEmisor['nits']:
+                    i = arreglosEmisor['nits'].index(dte["TIEMPO"])
+                    arreglosEmisor["movimientos"][i] += 1
+                else:
+                    arreglosEmisor["nits"].append(dte["TIEMPO"])
+                    arreglosEmisor["movimientos"].append(1)
+
+        arreglosReceptor = {
+            'nits':[],
+            'movimientos':[]
+        }
+
+        for dte in self.ListadoAutorizaciones:
+            dateCheck = toDateDMY(dte['TIEMPO'],"/")
+            print(nit)
+            print(dte["NIT_RECEPTOR"])
+            if nit == dte["NIT_RECEPTOR"] and dFrom < dateCheck < dTo:
+                if dte['TIEMPO'] in arreglosReceptor['nits']:
+                    i = arreglosReceptor['nits'].index(dte["TIEMPO"])
+                    arreglosReceptor["movimientos"][i] += 1
+                else:
+                    arreglosReceptor["nits"].append(dte["TIEMPO"])
+                    arreglosReceptor["movimientos"].append(1)
+
+
+        return {"emisor": arreglosEmisor, "receptor":arreglosReceptor}
 
     def consultaDatos(self):
         objInfo = {

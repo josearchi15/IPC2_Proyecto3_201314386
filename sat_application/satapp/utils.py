@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import base64
+import base64, datetime
 from io import BytesIO
 
 def get_graph():
@@ -12,14 +12,23 @@ def get_graph():
     buffer.close()
     return graph
 
-def get_plot(x, y):
+def get_plot(x, y, title, xlabel, ylabel):
     plt.switch_backend('AGG')
     plt.figure(figsize=(6,3))
-    plt.title('Rango por fecha')
+    plt.title(title)
     plt.plot(x,y,'o')
     plt.xticks(rotation=45)
-    plt.xlabel('item')
-    plt.ylabel('price')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.tight_layout()
     graph = get_graph()
     return graph
+
+def toDate(fecha, separator): #dd/mm/yyyy
+    arrDate = fecha.split(separator)
+    day = int(arrDate[2])
+    month = int(arrDate[1])
+    year = int(arrDate[0])
+    print(day, month, year)
+    date = datetime.date(year, month, day)
+    return date

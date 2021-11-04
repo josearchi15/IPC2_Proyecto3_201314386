@@ -23,8 +23,12 @@
     </form>
 
     {% if chart %}
-      <h1>Imagen</h1>
+      <h1>NIT Receptor</h1>
       <img src="data:image/png;base64, {{chart|safe}}" alt="">
+    {% endif %}
+    {% if chart2 %}
+      <h1>NIT Emisor</h1>
+      <img src="data:image/png;base64, {{chart2|safe}}" alt="">
     {% endif %}
 </div>
 {% endblock %}

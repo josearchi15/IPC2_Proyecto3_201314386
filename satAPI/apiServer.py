@@ -30,7 +30,9 @@ def consultaDatos():
 
 @app.route('/api/resumenRango', methods=["GET"])
 def resumenRago():
-    return jsonify({"menssage":"Server On!!!"})
+    print(request.json)
+    axes = autorizacion.resumenPorNit(request.json)
+    return jsonify(axes)
 
 @app.route('/api/resumenIva')
 def resumenIva():
