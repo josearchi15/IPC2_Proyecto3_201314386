@@ -1,0 +1,31 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="container">
+    <h1>Grafica total o valor(sin IVA)</h1>
+    <br><br><br>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="inicio" class="form-label">Fecha incio</label>
+            <input class="form-control" type="date" id="inicio" name="start">
+          </div>
+        <div class="mb-3">
+            <label for="fin" class="form-label">Fecha fin</label>
+            <input class="form-control" type="date" id="fin" name="end">
+          </div>
+          
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+
+    {% if chart %}
+      <h1>Valores totales</h1>
+      <img src="data:image/png;base64, {{chart|safe}}" alt="">
+    {% endif %}
+    {% if chart2 %}
+      <h1>Valores sin IVA</h1>
+      <img src="data:image/png;base64, {{chart2|safe}}" alt="">
+    {% endif %}
+</div>
+{% endblock %}

@@ -61,3 +61,29 @@ def graficaFechas(request):
         chart2 = None
         
     return render(request, "graficaFecha.html", {'chart':chart, 'chart2':chart2})
+
+def graficaValores(request):
+    if request.method == "POST":
+        start = toDate(request.POST['start'], "-")
+        end = toDate(request.POST['end'], "-")
+
+        data = {'start':str(start), 'end':str(end)}
+
+        response = requests.get(BASE_API_URL+"resumenIva", json=data)
+        print(response.json())
+
+        # imagen total o sin iva
+        xval = response.json()["totales"]["fecha"]
+        yval = response.json()["totales"]["valores"]
+        chart = get_plot(xval, yval, "Valores Totales", "Fecha", "Totales")
+
+        # imagen total o sin iva
+        xval1 = response.json()["valoresSinIVA"]["fecha"]
+        yval1 = response.json()["valoresSinIVA"]["valores"]
+        chart2 = get_plot(xval1, yval1, "Valores sin IVA", "Fecha", "Valores")
+
+    else:
+        chart = None
+        chart2 = None
+        
+    return render(request, "graficaValores.html", {'chart':chart, 'chart2':chart2})

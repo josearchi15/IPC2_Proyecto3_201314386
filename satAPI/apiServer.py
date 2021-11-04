@@ -34,9 +34,11 @@ def resumenRago():
     axes = autorizacion.resumenPorNit(request.json)
     return jsonify(axes)
 
-@app.route('/api/resumenIva')
+@app.route('/api/resumenIva', methods=["GET"])
 def resumenIva():
-    return jsonify({"menssage":"Server On!!!"})
+    print(request.json)
+    axes = autorizacion.resumenPorValor(request.json)
+    return jsonify(axes)
 
 
 

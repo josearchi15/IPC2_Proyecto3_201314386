@@ -83,7 +83,7 @@ class Autorizacion:
                     self.cantidadReceptores.append(dte["NIT_RECEPTOR"])
                 dte["CODIGO_AUTORIZACION"] = codigoAutorizacion(dte, self.arrFechasTemp, self.idFecha)
                 self.ListadoAutorizaciones.append(dte)
-        self.aprobar()
+        # self.aprobar()
     
     def aprobar(self):
         for dte in self.ListadoAutorizaciones:
@@ -92,7 +92,8 @@ class Autorizacion:
                 "REFERENCIA": dte["REFERENCIA"], 
                 "CODIGO_AUTORIZACION":dte["CODIGO_AUTORIZACION"]
             }
-            self.aprobaciones.append(objDte)
+            if objDte not in self.aprobaciones:
+                self.aprobaciones.append(objDte)
     
     def resumenPorNit(self, data):
         dFrom = toDateYMD(data['start'],"-")
@@ -135,7 +136,49 @@ class Autorizacion:
 
         return {"emisor": arreglosEmisor, "receptor":arreglosReceptor}
 
+    def resumenPorValor(self, data):
+        dFrom = toDateYMD(data['start'],"-")
+        dTo = toDateYMD(data['end'],"-")
+
+        valoresTotales = {
+            'fecha':[],
+            'valores':[]
+        }
+
+        for dte in self.ListadoAutorizaciones:
+            dateCheck = toDateDMY(dte['TIEMPO'],"/")
+            print(type(dte["TOTAL"]))
+
+            if dFrom < dateCheck < dTo:
+                if dte['TIEMPO'] in valoresTotales['fecha']:
+                    i = valoresTotales['fecha'].index(dte["TIEMPO"])
+                    valoresTotales["valores"][i] += float(dte["TOTAL"])
+                else:
+                    valoresTotales["fecha"].append(dte["TIEMPO"])
+                    valoresTotales["valores"].append(float(dte["TOTAL"]))
+
+        valoresSinIVA = {
+            'fecha':[],
+            'valores':[]
+        }
+
+        for dte in self.ListadoAutorizaciones:
+            dateCheck = toDateDMY(dte['TIEMPO'],"/")
+            print(type(dte["TOTAL"]))
+
+            if dFrom < dateCheck < dTo:
+                if dte['TIEMPO'] in valoresSinIVA['fecha']:
+                    i = valoresSinIVA['fecha'].index(dte["TIEMPO"])
+                    valoresSinIVA["valores"][i] += float(dte["VALOR"])
+                else:
+                    valoresSinIVA["fecha"].append(dte["TIEMPO"])
+                    valoresSinIVA["valores"].append(float(dte["VALOR"]))
+
+
+        return {"totales": valoresTotales, "valoresSinIVA":valoresSinIVA}
+
     def consultaDatos(self):
+        self.aprobar()
         objInfo = {
             "AUTORIZACION":{
                 "FECHA": self.fecha,
@@ -204,3 +247,4 @@ def encabezado(fecha):
     for wr in arr:
         strFormat += wr
     return strFormat
+
